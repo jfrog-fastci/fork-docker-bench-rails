@@ -1,12 +1,16 @@
-FROM ruby:3.3
+FROM ruby:3.3-slim
 
-RUN apt-get update && apt-get install -y vim less man-db wget telnet curl net-tools iputils-ping htop dnsutils strace nodejs
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY . .
+COPY Gemfile Gemfile.lock* ./
+RUN bundle install --without development test && \
+    rm -rf /usr/local/bundle/cache
 
-RUN bundle install
+COPY . .
 
 EXPOSE 3000
 
